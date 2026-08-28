@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - GamerMarket</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Password Authentication Overlay -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-modal">
+      <div class="logo" style="justify-content: center; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-lock"></i>
+        <span>Admin Panel</span>
+      </div>
+      <p class="subtitle" style="margin-bottom: 1.5rem;">Insira a senha de administrador para acessar o gerador de códigos.</p>
+      
+      <div id="auth-error" class="alert alert-error hide" style="padding: 0.75rem; margin-bottom: 1rem;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>Senha incorreta!</span>
+      </div>
+
+      <form id="auth-form">
+        <div class="form-group">
+          <div class="input-wrapper">
+            <input type="password" id="auth-password" placeholder="Senha do Administrador" required>
+            <i class="fa-solid fa-key input-icon"></i>
+          </div>
+        </div>
+        <button type="submit" class="btn">
+          <i class="fa-solid fa-unlock-keyhole"></i>Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>GamerMarket Admin</span>
+    </div>
+    <a href="index.html" class="nav-link">
+      <i class="fa-solid fa-arrow-left" style="margin-right: 0.5rem;"></i>Verificação Cliente
+    </a>
+  </header>
+
+  <main>
+    <div class="container admin-layout hide" id="admin-container">
+      <div class="admin-header">
+        <div class="admin-title">
+          <i class="fa-solid fa-circle-nodes"></i>
+          <span>Gerenciador de Entregas</span>
+        </div>
+        <button id="btn-logout" class="nav-link" style="border: 1px solid var(--border-color); cursor: pointer;">
+          <i class="fa-solid fa-power-off"></i> Sair
+        </button>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Add Accounts Panel -->
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-square-plus" style="color: var(--accent-purple);"></i>Cadastrar Conta</h2>
+          
+          <form id="add-account-form">
+            <div class="form-group">
+              <label class="field-label">E-mail / Usuário</label>
+              <div class="input-wrapper">
+                <input type="text" id="acc-username" placeholder="ex: cliente@email.com" required style="padding-left: 1.25rem;">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">Senha</label>
+              <div class="input-wrapper">
+                <input type="text" id="acc-password" placeholder="ex: SenhaSuperSegura123" required style="padding-left: 1.25rem;">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">Instruções / Info Extra (Opcional)</label>
+              <textarea id="acc-extra" placeholder="ex: Link para download, instruções de ativação, código de recuperação..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">Código Personalizado (Opcional)</label>
+              <div class="input-wrapper">
+                <input type="text" id="acc-custom-code" placeholder="Deixe em branco para gerar aleatório" style="padding-left: 1.25rem; font-family: monospace;">
+              </div>
+            </div>
+
+            <button type="submit" class="btn">
+              <i class="fa-solid fa-plus"></i>Adicionar à Lista
+            </button>
+          </form>
+        </div>
+
+        <!-- Current Session List & Export -->
+        <div class="admin-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h2><i class="fa-solid fa-list-check" style="color: var(--accent-cyan);"></i>Lista de Exportação</h2>
+            
+            <!-- Import Option -->
+            <div style="margin-bottom: 1.5rem; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 10px; background: rgba(255,255,255,0.01);">
+              <label class="field-label" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-file-import"></i> Mesclar com database.json existente</label>
+              <input type="file" id="import-db-file" accept=".json" style="font-size: 0.8rem; width: 100%; color: var(--text-muted);">
+            </div>
+
+            <div class="code-list-container" id="code-list">
+              <div class="no-codes">Nenhuma conta adicionada nesta sessão.</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <button id="btn-export-json" class="btn btn-cyan" disabled>
+              <i class="fa-solid fa-file-arrow-down"></i>Exportar database.json
+            </button>
+            <button id="btn-export-txt" class="btn btn-secondary" disabled>
+              <i class="fa-solid fa-file-lines"></i>Copiar Códigos para Vendas
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 GamerMarket Delivery System. Painel de Controle.</p>
+  </footer>
+
+  <script src="admin.js"></script>
+</body>
+</html>

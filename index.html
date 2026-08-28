@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificação & Entrega - GamerMarket</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <header style="justify-content: center;">
+    <div class="logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>GamerMarket</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" id="main-container">
+      <div id="input-view">
+        <h1>Resgatar Conta</h1>
+        <p class="subtitle">Insira o código único recebido na sua compra do GamerMarket para realizar a verificação e liberar seus dados.</p>
+        
+        <div id="error-alert" class="alert alert-error hide">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="error-message">Código inválido ou não encontrado.</span>
+        </div>
+
+        <form id="redeem-form">
+          <div class="form-group">
+            <div class="input-wrapper">
+              <input type="text" id="redeem-code" placeholder="GM-XXXX-XXXX-XXXX" required autocomplete="off" spellcheck="false">
+              <i class="fa-solid fa-ticket input-icon"></i>
+            </div>
+          </div>
+          <button type="submit" class="btn">
+            <i class="fa-solid fa-robot"></i>Verificar e Resgatar
+          </button>
+        </form>
+      </div>
+
+      <!-- Verification Loading View -->
+      <div id="verifying-view" class="verification-container hide">
+        <div class="scanner-ring"></div>
+        <div class="verification-status" id="verify-status">Inicializando verificação</div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="verify-progress"></div>
+        </div>
+        <div class="verification-log" id="verify-log">Iniciando handshake seguro...</div>
+      </div>
+
+      <!-- Account Details Revealed View -->
+      <div id="reveal-view" class="hide">
+        <div class="success-banner">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Verificação Concluída com Sucesso!</span>
+        </div>
+        
+        <h1>Seus Dados de Acesso</h1>
+        <p class="subtitle" style="margin-bottom: 1.5rem;">Guarde esses dados com segurança. Você poderá acessar este site novamente usando o mesmo código.</p>
+
+        <div class="account-card">
+          <div class="account-field" id="field-user-container">
+            <div class="field-label">
+              <i class="fa-solid fa-user"></i>Usuário / E-mail
+            </div>
+            <div class="field-value-wrapper">
+              <div class="field-value" id="account-user">username@mail.com</div>
+              <button class="btn-copy" data-target="account-user" title="Copiar usuário">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="account-field" id="field-pass-container">
+            <div class="field-label">
+              <i class="fa-solid fa-key"></i>Senha
+            </div>
+            <div class="field-value-wrapper">
+              <div class="field-value" id="account-pass">••••••••••••</div>
+              <button class="btn-copy" data-target="account-pass" title="Copiar senha">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="account-field hide" id="field-extra-container">
+            <div class="field-label">
+              <i class="fa-solid fa-circle-info"></i>Instruções Adicionais
+            </div>
+            <div class="instruction-box" id="account-extra">
+              Aqui estarão as instruções de ativação da conta.
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-back" class="btn btn-secondary" style="margin-top: 1.5rem;">
+          <i class="fa-solid fa-arrow-left"></i>Voltar
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 GamerMarket Delivery System. Seguro e Criptografado ponta-a-ponta.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
