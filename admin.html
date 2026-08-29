@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin - GamerMarket</title>
+  <title>Painel Admin - GamerMarket Manager</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -16,17 +16,23 @@
         <i class="fa-solid fa-lock"></i>
         <span>Admin Panel</span>
       </div>
-      <p class="subtitle" style="margin-bottom: 1.5rem;">Insira a senha de administrador para acessar o gerador de códigos.</p>
+      <p class="subtitle" style="margin-bottom: 1.5rem;">Insira o usuário e senha do painel para acessar o gerenciador.</p>
       
       <div id="auth-error" class="alert alert-error hide" style="padding: 0.75rem; margin-bottom: 1rem;">
         <i class="fa-solid fa-circle-exclamation"></i>
-        <span>Senha incorreta!</span>
+        <span id="auth-error-msg">Dados incorretos!</span>
       </div>
 
       <form id="auth-form">
         <div class="form-group">
           <div class="input-wrapper">
-            <input type="password" id="auth-password" placeholder="Senha do Administrador" required>
+            <input type="text" id="auth-username" placeholder="Usuário" required style="padding-left: 3.2rem;">
+            <i class="fa-solid fa-user input-icon"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-wrapper">
+            <input type="password" id="auth-password" placeholder="Senha do Administrador" required style="padding-left: 3.2rem;">
             <i class="fa-solid fa-key input-icon"></i>
           </div>
         </div>
@@ -52,7 +58,7 @@
       <div class="admin-header">
         <div class="admin-title">
           <i class="fa-solid fa-circle-nodes"></i>
-          <span>Gerenciador de Entregas</span>
+          <span>Gerenciador de Entregas SQLite</span>
         </div>
         <button id="btn-logout" class="nav-link" style="border: 1px solid var(--border-color); cursor: pointer;">
           <i class="fa-solid fa-power-off"></i> Sair
@@ -60,74 +66,123 @@
       </div>
 
       <div class="admin-grid">
-        <!-- Add Accounts Panel -->
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-square-plus" style="color: var(--accent-purple);"></i>Cadastrar Conta</h2>
+        
+        <!-- Left Panel: Configurations & Input -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
           
-          <form id="add-account-form">
-            <div class="form-group">
-              <label class="field-label">E-mail / Usuário</label>
-              <div class="input-wrapper">
-                <input type="text" id="acc-username" placeholder="ex: cliente@email.com" required style="padding-left: 1.25rem;">
-              </div>
+          <!-- Select Product -->
+          <div class="admin-card">
+            <h2><i class="fa-solid fa-box-archive" style="color: var(--accent-cyan);"></i>Selecionar Produto</h2>
+            <div class="form-group" style="margin-bottom: 0;">
+              <select id="product-select">
+                <!-- Populated dynamically -->
+              </select>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label class="field-label">Senha</label>
-              <div class="input-wrapper">
-                <input type="text" id="acc-password" placeholder="ex: SenhaSuperSegura123" required style="padding-left: 1.25rem;">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="field-label">Instruções / Info Extra (Opcional)</label>
-              <textarea id="acc-extra" placeholder="ex: Link para download, instruções de ativação, código de recuperação..."></textarea>
-            </div>
-
-            <div class="form-group">
-              <label class="field-label">Código Personalizado (Opcional)</label>
-              <div class="input-wrapper">
-                <input type="text" id="acc-custom-code" placeholder="Deixe em branco para gerar aleatório" style="padding-left: 1.25rem; font-family: monospace;">
-              </div>
-            </div>
-
-            <button type="submit" class="btn">
-              <i class="fa-solid fa-plus"></i>Adicionar à Lista
-            </button>
-          </form>
-        </div>
-
-        <!-- Current Session List & Export -->
-        <div class="admin-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <h2><i class="fa-solid fa-list-check" style="color: var(--accent-cyan);"></i>Lista de Exportação</h2>
+          <!-- Add Credentials / Codes -->
+          <div class="admin-card">
+            <h2><i class="fa-solid fa-square-plus" style="color: var(--accent-purple);"></i>Adicionar Contas ao Estoque</h2>
+            <p class="subtitle" style="text-align: left; margin-bottom: 1rem; font-size: 0.85rem;">
+              Insira uma conta por linha utilizando o separador definido no produto (Padrão: <code style="color: var(--accent-cyan);">email--senha--instruções</code>).
+            </p>
             
-            <!-- Import Option -->
-            <div style="margin-bottom: 1.5rem; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: 10px; background: rgba(255,255,255,0.01);">
-              <label class="field-label" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-file-import"></i> Mesclar com database.json existente</label>
-              <input type="file" id="import-db-file" accept=".json" style="font-size: 0.8rem; width: 100%; color: var(--text-muted);">
-            </div>
-
-            <div class="code-list-container" id="code-list">
-              <div class="no-codes">Nenhuma conta adicionada nesta sessão.</div>
-            </div>
+            <form id="add-codes-form">
+              <div class="form-group">
+                <textarea id="codes-input" rows="8" placeholder="email1@gmail.com--senha123&#10;email2@gmail.com--senha456--extra info" required></textarea>
+              </div>
+              <button type="submit" class="btn">
+                <i class="fa-solid fa-plus"></i>Cadastrar no Estoque
+              </button>
+            </form>
           </div>
 
-          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
-            <button id="btn-export-json" class="btn btn-cyan" disabled>
-              <i class="fa-solid fa-file-arrow-down"></i>Exportar database.json
-            </button>
-            <button id="btn-export-txt" class="btn btn-secondary" disabled>
-              <i class="fa-solid fa-file-lines"></i>Copiar Códigos para Vendas
+          <!-- Sync with GamerMarket -->
+          <div class="admin-card">
+            <h2><i class="fa-solid fa-rotate" style="color: var(--accent-green);"></i>Sincronizar Estoque</h2>
+            <p class="subtitle" style="text-align: left; margin-bottom: 1rem; font-size: 0.85rem;">
+              Envia os códigos gerados para o estoque correspondente no painel do GamerMarket.
+            </p>
+            <div class="form-group">
+              <label class="field-label">Quantidade de códigos para enviar</label>
+              <input type="number" id="sync-limit" min="1" max="100" value="20" style="padding-left: 1.25rem;">
+            </div>
+            <button id="btn-sync" class="btn btn-cyan">
+              <i class="fa-solid fa-cloud-arrow-up"></i>Enviar para GamerMarket
             </button>
           </div>
+
+          <!-- Create Product -->
+          <div class="admin-card">
+            <h2><i class="fa-solid fa-folder-plus" style="color: var(--text-muted);"></i>Cadastrar Novo Produto</h2>
+            <form id="create-product-form">
+              <div class="form-group">
+                <label class="field-label">Nome do Produto</label>
+                <input type="text" id="prod-name" placeholder="Ex: Conta Valorant Diamond" required style="padding-left: 1.25rem;">
+              </div>
+              <div class="form-group">
+                <label class="field-label">ID do Produto na GamerMarket</label>
+                <input type="text" id="prod-gm-id" placeholder="Ex: 123456" required style="padding-left: 1.25rem;">
+              </div>
+              <div class="form-group">
+                <label class="field-label">Variant Index (Opcional)</label>
+                <input type="number" id="prod-variant" value="0" style="padding-left: 1.25rem;">
+              </div>
+              <div class="form-group">
+                <label class="field-label">Separador (Padrão: --)</label>
+                <input type="text" id="prod-separator" value="--" style="padding-left: 1.25rem;">
+              </div>
+              <button type="submit" class="btn btn-secondary">
+                <i class="fa-solid fa-folder-plus"></i>Criar Produto
+              </button>
+            </form>
+          </div>
+
         </div>
+
+        <!-- Right Panel: Statistics & Live Stock View -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          
+          <!-- Statistics -->
+          <div class="admin-card">
+            <h2><i class="fa-solid fa-chart-simple" style="color: var(--accent-cyan);"></i>Estatísticas do Produto</h2>
+            
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val available" id="stat-available">0</div>
+                <div class="stat-lbl">Dispo.</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val sent" id="stat-sent">0</div>
+                <div class="stat-lbl">Envia.</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val reserved" id="stat-reserved">0</div>
+                <div class="stat-lbl">Reser.</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val redeemed" id="stat-redeemed">0</div>
+                <div class="stat-lbl">Resga.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stock List -->
+          <div class="admin-card" style="display: flex; flex-direction: column;">
+            <h2><i class="fa-solid fa-list" style="color: var(--accent-purple);"></i>Códigos no Estoque (Recentes)</h2>
+            <div class="code-list-container" id="stock-list">
+              <div class="no-codes">Selecione um produto para visualizar o estoque.</div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2026 GamerMarket Delivery System. Painel de Controle.</p>
+    <p>&copy; 2026 GamerMarket Delivery System. Painel de Controle SQLite.</p>
   </footer>
 
   <script src="admin.js"></script>

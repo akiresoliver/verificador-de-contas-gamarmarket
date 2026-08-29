@@ -20,65 +20,16 @@ const fieldPassContainer = document.getElementById('field-pass-container');
 const fieldExtraContainer = document.getElementById('field-extra-container');
 
 const btnBack = document.getElementById('btn-back');
-
-// --- Helper Cryptographic Functions ---
-
-// Base64 string to ArrayBuffer
-function base64ToArrayBuffer(base64) {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-// SHA-256 to Hex String
-async function sha256Hex(message) {
-  const msgBuffer = new TextEncoder().encode(message.trim());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Import code as a raw AES-GCM Key (using its SHA-256 hash)
-async function getCryptoKey(code) {
-  const encoder = new TextEncoder();
-  const rawKey = encoder.encode(code.trim());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', rawKey);
-  return crypto.subtle.importKey(
-    'raw',
-    hashBuffer,
-    { name: 'AES-GCM' },
-    false,
-    ['decrypt']
-  );
-}
-
-// Decrypt the payload
-async function decryptPayload(ciphertextBase64, ivBase64, code) {
-  const key = await getCryptoKey(code);
-  const iv = new Uint8Array(base64ToArrayBuffer(ivBase64));
-  const ciphertext = new Uint8Array(base64ToArrayBuffer(ciphertextBase64));
-  
-  const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv },
-    key,
-    ciphertext
-  );
-  
-  return new TextDecoder().decode(decrypted);
-}
+const btnCopyAll = document.getElementById('btn-copy-all');
 
 // --- Verification Sequence Logic ---
 
 const verificationSteps = [
-  { progress: 10, status: "Handshake seguro", log: "Conectando ao banco descentralizado..." },
-  { progress: 30, status: "Verificação humana", log: "Analisando heurística de comportamento..." },
-  { progress: 55, status: "Localizando registro", log: "Buscando hash correspondente no banco de dados..." },
-  { progress: 75, status: "Descriptografia", log: "Carregando chaves e descriptografando dados da conta..." },
-  { progress: 95, status: "Finalizando", log: "Liberando credenciais de acesso..." },
-  { progress: 100, status: "Concluído", log: "Sucesso!" }
+  { progress: 15, status: "Handshake seguro", log: "Conectando ao servidor..." },
+  { progress: 35, status: "Verificação humana", log: "Avaliando assinatura de segurança..." },
+  { progress: 60, status: "Validando Token", log: "Consultando banco de dados SQLite..." },
+  { progress: 85, status: "Registrando Acesso", log: "Vinculando e bloqueando IP de segurança..." },
+  { progress: 100, status: "Concluído", log: "Credenciais liberadas com sucesso!" }
 ];
 
 async function runVerificationAnimation() {
@@ -91,7 +42,7 @@ async function runVerificationAnimation() {
     verifyProgress.style.width = `${step.progress}%`;
     
     // Simulate natural processing delay for each step
-    await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 500));
+    await new Promise(resolve => setTimeout(resolve, 350 + Math.random() * 200));
   }
 }
 
@@ -105,69 +56,56 @@ redeemForm.addEventListener('submit', async (e) => {
   if (!rawCode) return;
 
   try {
-    // 1. Fetch database.json (cache-busting to ensure we always get the latest)
-    const dbResponse = await fetch(`database.json?t=${Date.now()}`);
-    if (!dbResponse.ok) {
-      throw new Error("Erro ao carregar o banco de dados. Verifique se o arquivo database.json foi criado.");
-    }
-    
-    const db = await dbResponse.json();
-    
-    // 2. Hash the code
-    const codeHash = await sha256Hex(rawCode);
-    
-    // 3. Find in database
-    if (!db[codeHash]) {
-      showError("Código de resgate inválido ou já expirou.");
+    // 1. Call Backend Redeem API
+    const response = await fetch('/api/redeem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ code: rawCode })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showError(data.error || "Erro ao resgatar código.");
       return;
     }
-    
-    const record = db[codeHash];
 
-    // 4. Play simulation verification animation
+    // 2. Play simulated loading animation
     await runVerificationAnimation();
-    
-    // 5. Decrypt
-    try {
-      const decryptedString = await decryptPayload(record.ciphertext, record.iv, rawCode);
-      const accountData = JSON.parse(decryptedString);
-      
-      // Populate and reveal fields
-      if (accountData.username) {
-        accountUser.innerText = accountData.username;
-        fieldUserContainer.classList.remove('hide');
-      } else {
-        fieldUserContainer.classList.add('hide');
-      }
 
-      if (accountData.password) {
-        accountPass.innerText = accountData.password;
-        fieldPassContainer.classList.remove('hide');
-      } else {
-        fieldPassContainer.classList.add('hide');
-      }
+    // 3. Populate credentials
+    const creds = data.credentials;
 
-      if (accountData.extra) {
-        accountExtra.innerText = accountData.extra;
-        fieldExtraContainer.classList.remove('hide');
-      } else {
-        fieldExtraContainer.classList.add('hide');
-      }
-      
-      // Reveal account view
-      verifyingView.classList.add('hide');
-      revealView.classList.remove('hide');
-      
-    } catch (decryptErr) {
-      console.error(decryptErr);
-      verifyingView.classList.add('hide');
-      inputView.classList.remove('hide');
-      showError("Falha na descriptografia. O código está correto, mas a chave é incompatível.");
+    if (creds.username) {
+      accountUser.innerText = creds.username;
+      fieldUserContainer.classList.remove('hide');
+    } else {
+      fieldUserContainer.classList.add('hide');
     }
+
+    if (creds.password) {
+      accountPass.innerText = creds.password;
+      fieldPassContainer.classList.remove('hide');
+    } else {
+      fieldPassContainer.classList.add('hide');
+    }
+
+    if (creds.extra) {
+      accountExtra.innerText = creds.extra;
+      fieldExtraContainer.classList.remove('hide');
+    } else {
+      fieldExtraContainer.classList.add('hide');
+    }
+    
+    // 4. Reveal account view
+    verifyingView.classList.add('hide');
+    revealView.classList.remove('hide');
 
   } catch (err) {
     console.error(err);
-    showError(err.message || "Erro desconectado ao buscar conta.");
+    showError("Erro ao comunicar com o servidor. Verifique sua conexão.");
   }
 });
 
@@ -208,4 +146,27 @@ document.querySelectorAll('.btn-copy').forEach(button => {
       console.error("Falha ao copiar: ", err);
     }
   });
+});
+
+// --- Copy All (User + Password) Action ---
+btnCopyAll.addEventListener('click', async () => {
+  const userText = accountUser.innerText;
+  const passText = accountPass.innerText;
+  const textToCopy = `Usuário: ${userText}\nSenha: ${passText}`;
+  
+  try {
+    await navigator.clipboard.writeText(textToCopy);
+    
+    // Visually indicate success
+    btnCopyAll.classList.add('copied');
+    const originalText = btnCopyAll.innerHTML;
+    btnCopyAll.innerHTML = '<i class="fa-solid fa-check"></i> Dados Copiados!';
+    
+    setTimeout(() => {
+      btnCopyAll.classList.remove('copied');
+      btnCopyAll.innerHTML = originalText;
+    }, 2000);
+  } catch (err) {
+    console.error("Falha ao copiar tudo: ", err);
+  }
 });

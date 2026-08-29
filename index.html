@@ -58,7 +58,7 @@
         </div>
         
         <h1>Seus Dados de Acesso</h1>
-        <p class="subtitle" style="margin-bottom: 1.5rem;">Guarde esses dados com segurança. Você poderá acessar este site novamente usando o mesmo código.</p>
+        <p class="subtitle" style="margin-bottom: 1.5rem;">Guarde esses dados com segurança. Este resgate é exclusivo e ficará vinculado ao seu dispositivo.</p>
 
         <div class="account-card">
           <div class="account-field" id="field-user-container">
@@ -95,7 +95,21 @@
           </div>
         </div>
 
-        <button id="btn-back" class="btn btn-secondary" style="margin-top: 1.5rem;">
+        <!-- Copy All Button -->
+        <button id="btn-copy-all" class="btn btn-cyan" style="margin-top: 1.25rem;">
+          <i class="fa-solid fa-copy"></i>Copiar Tudo (Usuário + Senha)
+        </button>
+
+        <!-- Safety Warning Box -->
+        <div style="margin-top: 1.25rem; padding: 1rem; border: 1px solid rgba(244, 63, 94, 0.2); border-radius: 12px; background: rgba(244, 63, 94, 0.05); color: #fda4af; font-size: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #f43f5e; font-size: 1.2rem; margin-top: 0.1rem; flex-shrink: 0;"></i>
+          <div style="text-align: left; line-height: 1.4;">
+            <strong style="color: #fff; display: block; margin-bottom: 0.25rem;">Atenção Comprador!</strong>
+            Copie as suas credenciais acima e salve-as em um local seguro (bloco de notas, etc.). Este código de resgate é exclusivo e está vinculado ao seu IP. Outros computadores ou conexões não conseguirão usá-lo.
+          </div>
+        </div>
+
+        <button id="btn-back" class="btn btn-secondary" style="margin-top: 1.25rem;">
           <i class="fa-solid fa-arrow-left"></i>Voltar
         </button>
       </div>
